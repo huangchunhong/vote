@@ -39,10 +39,10 @@ export default {
       sexId:"0",
       checkId:"",
       personList:[
-        {depart:{departName:"设计",id:"1",children:[{name:"陈永杰",id:"1",sex:"1",check:""},{name:"姚鑫",id:"2",sex:"1",check:""},{name:"叶志勇",id:"3",sex:"1",check:""},{name:"陈晨",id:"4",sex:"1",check:""},{name:"陈杰",id:"5",sex:"1",check:""},{name:"易剑芸",id:"6",sex:"1",check:""}]}},
-        {depart:{departName:"设计",id:"1",children:[{name:"陈丽丽",id:"11",sex:"2",check:""},{name:"易艳君",id:"12",sex:"2",check:""},{name:"张琪媛",id:"13",sex:"2",check:""},{name:"夏玲玉",id:"14",sex:"2",check:""}]}},
-        {depart:{departName:"前端",id:"2",children:[{name:"温富杰",id:"21",sex:"1",check:""},{name:"黄剑坤",id:"22",sex:"1",check:""},{name:"刘宏",id:"23",sex:"1",check:""},{name:"骆至坤",id:"24",sex:"1",check:""},{name:"田文滨",id:"25",sex:"1",check:""}]}},
-        {depart:{departName:"-前端",id:"2",children:[{name:"刘洪南",id:"31",sex:"2",check:""},{name:"陈梅秀",id:"32",sex:"2",check:""},{name:"李凌燕",id:"33",sex:"2",check:""},{name:"李曼",id:"34",sex:"2",check:""},{name:"周微微",id:"35",sex:"2",check:""}]}}
+        {depart:{departName:"男-设计",id:"1",children:[{name:"陈永杰",id:"1",sex:"1",check:""},{name:"姚鑫",id:"2",sex:"1",check:""},{name:"叶志勇",id:"3",sex:"1",check:""},{name:"陈晨",id:"4",sex:"1",check:""},{name:"陈杰",id:"5",sex:"1",check:""},{name:"易剑芸",id:"6",sex:"1",check:""}]}},
+        {depart:{departName:"女-设计",id:"1",children:[{name:"陈丽丽",id:"11",sex:"2",check:""},{name:"易艳君",id:"12",sex:"2",check:""},{name:"张琪媛",id:"13",sex:"2",check:""},{name:"夏玲玉",id:"14",sex:"2",check:""}]}},
+        {depart:{departName:"男-前端",id:"2",children:[{name:"温富杰",id:"21",sex:"1",check:""},{name:"黄剑坤",id:"22",sex:"1",check:""},{name:"刘宏",id:"23",sex:"1",check:""},{name:"骆至坤",id:"24",sex:"1",check:""},{name:"田文滨",id:"25",sex:"1",check:""}]}},
+        {depart:{departName:"女-前端",id:"2",children:[{name:"刘洪南",id:"31",sex:"2",check:""},{name:"陈梅秀",id:"32",sex:"2",check:""},{name:"李凌燕",id:"33",sex:"2",check:""},{name:"李曼",id:"34",sex:"2",check:""},{name:"周微微",id:"35",sex:"2",check:""}]}}
       ]
     }
   },
