@@ -11,26 +11,22 @@
     </div>
     <div class="vote-opertion-box">
       <el-button @click="voteEvn">抽奖</el-button>
-      <el-select v-model="selectDepartVal"  @change="selectDepartEvn" label="部门">
+      <el-select v-model="selectDepartVal"  @change="selectDepartEvn">
         <el-option label="全部" value=""></el-option>
-        <el-option label="部门-WEB" value="1"></el-option>
-        <el-option label="部门-PHP" value="2"></el-option>
-        <el-option label="部门-JAVA" value="3"></el-option>
-        <el-option label="部门-TEST" value="4"></el-option>
+        <el-option label="设计" value="1"></el-option>
+        <el-option label="前端" value="2"></el-option>
       </el-select>
-      <el-select v-model="selectSexVal"  @change="selectSexEvn" label="性别">
+      <el-select v-model="selectSexVal"  @change="selectSexEvn">
         <el-option label="全部" value=""></el-option>
         <el-option label="男" value="1"></el-option>
         <el-option label="女" value="2"></el-option>
       </el-select>
-      <el-button @click="voteAllEvn">全选</el-button>
       <el-input-number v-model="SelectedNum"></el-input-number>
     </div>
   </div>
 </template>
 
 <script>
-import $ from 'jquery'
 export default {
   name: 'Vote',
   data () {
@@ -43,10 +39,10 @@ export default {
       sexId:"0",
       checkId:"",
       personList:[
-        {depart:{departName:"部门-WEB",id:"1",children:[{name:"A",id:"1",sex:"1",check:""},{name:"B",id:"2",sex:"1",check:""},{name:"C",id:"3",sex:"1",check:""},{name:"D",id:"4",sex:"1",check:""}]}},
-        {depart:{departName:"部门-PHP",id:"2",children:[{name:"F",id:"11",sex:"2",check:""},{name:"G",id:"12",sex:"2",check:""},{name:"H",id:"13",sex:"2",check:""},{name:"I",id:"14",sex:"2",check:""}]}},
-        {depart:{departName:"部门-JAVA",id:"3",children:[{name:"J",id:"21",sex:"1",check:""},{name:"K",id:"22",sex:"1",check:""},{name:"L",id:"23",sex:"1",check:""},{name:"M",id:"24",sex:"1",check:""}]}},
-        {depart:{departName:"部门-TEST",id:"4",children:[{name:"N",id:"31",sex:"2",check:""},{name:"O",id:"32",sex:"2",check:""},{name:"P",id:"33",sex:"2",check:""},{name:"Q",id:"34",sex:"2",check:""}]}}
+        {depart:{departName:"设计",id:"1",children:[{name:"陈永杰",id:"1",sex:"1",check:""},{name:"姚鑫",id:"2",sex:"1",check:""},{name:"叶志勇",id:"3",sex:"1",check:""},{name:"陈晨",id:"4",sex:"1",check:""},{name:"陈杰",id:"5",sex:"1",check:""},{name:"易剑芸",id:"6",sex:"1",check:""}]}},
+        {depart:{departName:"设计",id:"1",children:[{name:"陈丽丽",id:"11",sex:"2",check:""},{name:"易艳君",id:"12",sex:"2",check:""},{name:"张琪媛",id:"13",sex:"2",check:""},{name:"夏玲玉",id:"14",sex:"2",check:""}]}},
+        {depart:{departName:"前端",id:"2",children:[{name:"温富杰",id:"21",sex:"1",check:""},{name:"黄剑坤",id:"22",sex:"1",check:""},{name:"刘宏",id:"23",sex:"1",check:""},{name:"骆至坤",id:"24",sex:"1",check:""},{name:"田文滨",id:"25",sex:"1",check:""}]}},
+        {depart:{departName:"-前端",id:"2",children:[{name:"刘洪南",id:"31",sex:"2",check:""},{name:"陈梅秀",id:"32",sex:"2",check:""},{name:"李凌燕",id:"33",sex:"2",check:""},{name:"李曼",id:"34",sex:"2",check:""},{name:"周微微",id:"35",sex:"2",check:""}]}}
       ]
     }
   },
@@ -57,12 +53,13 @@ export default {
         return
       }
       this.Arr = this.arrayIntersection(this.arrDepart, this.arrSex);
-      // console.log(this.Arr,"交集")
+      console.log(this.arrDepart, this.arrSex)
+      console.log(this.Arr, "交集")
       let getRound=0;
       let timer = setInterval(()=>{
         let getItems = this.getArrayItems(this.Arr,this.SelectedNum);
-        console.log(getItems)
-          if(getRound==10){
+        // console.log(getItems)
+          if(getRound==30){
             clearInterval(timer)
           }
           getRound ++;
@@ -79,12 +76,10 @@ export default {
           }
       },100)
     },
-    // 全选
-    voteAllEvn(){
-      $(".depart-li").toggleClass("check");
-    },
     // 选择性别
     selectSexEvn(val){
+      
+      console.log(val)
       this.sexId="0";
       this.arrSex = [];
       if(val){
@@ -140,20 +135,8 @@ export default {
     },
     // 数组交集
     arrayIntersection(a, b){
-      var ai=0, bi=0;
-      var result = new Array();
-      while( ai < a.length && bi < b.length )
-      {
-        if (a[ai] < b[bi] ){ ai++; }
-        else if (a[ai] > b[bi] ){ bi++; }
-        else /* they're equal */
-        {
-          result.push(a[ai]);
-          ai++;
-          bi++;
-        }
-      }
-      return result;
+      let intersection = a.filter(function(v){ return b.indexOf(v) > -1 })
+      return intersection;
       },
       getEleId(val){
         let eleArr =new Array();
@@ -219,8 +202,12 @@ a {
   margin: 0 10px;
   padding: 3px 5px;
   border-radius: 5px;
-  padding-right: 10px;
   text-align: center;
+  cursor: pointer;
+}
+.depart-li:hover{
+  background-color: crimson;
+  color: #fff;
 }
 .check{
   background-color: crimson;

@@ -5,7 +5,14 @@
 const path = require('path')
 
 module.exports = {
-  dev: {
+  // Dev：开发环境，该环境下的配置项只影响开发人员本地代码配置，在项目初期代码本地编写时调试使用
+
+// Test：测试环境，该环境配置影响整个团队的测试环境
+
+// Production：正式生产环境，程序最终发布后所需要的参数配置
+
+
+  dev: {// dev 环境
 
     // Paths
     assetsSubDirectory: 'static',
@@ -14,8 +21,8 @@ module.exports = {
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
-    port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
-    autoOpenBrowser: true,
+    port: 8888,  // 运行测试页面的端口// can be overwritten by process.env.PORT, if port is in use, a free one will be determined
+    autoOpenBrowser: true,//运行时谷歌自动的打开项目
     errorOverlay: true,
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
@@ -36,20 +43,22 @@ module.exports = {
     cssSourceMap: true
   },
 
-  build: {
+  build: {//production 环境
     // Template for index.html
-    index: path.resolve(__dirname, '../dist/index.html'),
+    index: path.resolve(__dirname, '../dist/index.html'),// 编译输入的 index.html 文件
 
     // Paths
-    assetsRoot: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'static',
-    assetsPublicPath: './',
+    assetsRoot: path.resolve(__dirname, '../dist'),// 编译输出的静态资源路径
+    assetsSubDirectory: 'static',// 编译输出的二级目录
+    assetsPublicPath: './',// 编译发布的根目录，可配置为资源服务器域名或 CDN 域名 
+    // vue项目发布到github上 需要改为 ./  .gitignore文件要不能忽略dist npm run build 打包上传到github上 网页输入https://huangchunhong.github.io/vue_test/dist/#/ 就可以浏览
+
 
     /**
      * Source Maps
      */
 
-    productionSourceMap: true,
+    productionSourceMap: true,// 是否开启 cssSourceMap
     // https://webpack.js.org/configuration/devtool/#production
     devtool: '#source-map',
 
