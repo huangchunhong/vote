@@ -5,7 +5,7 @@
       <ul v-for="(item,index) in personList" :key="index" :depart-id="item.depart.id" class="depart">
         <h4>{{item.depart.departName}}</h4>
         <li class="depart-li" v-for="(itemChild,itemIndex) in item.depart.children" :key="itemIndex" :id="itemChild.id" @click="isCheckEvn(itemChild)"
-         :class="[departId=='0'?'':departId==item.depart.id?'':'disabled',sexId=='0'?'':sexId==itemChild.sex?'':'disabled-sex',itemChild.selected?'isSelected':'',itemChild.unJoin?'isCheck':'',]" 
+         :class="[itemChild.selected?'isSelected':'',itemChild.unJoin?'isCheck':'',itemChild.unJoinDepat?'unJoinDepat':'',itemChild.unJoinSex?'unJoinSex':'',]" 
          :data-id="itemChild.id" :sex="itemChild.sex">{{itemChild.name}}</li>
       </ul>
     </div>
@@ -40,14 +40,14 @@ export default {
       SelectedNum:1,
       selectSexVal:"",
       selectDepartVal:"",
-      departId:"0",
-      sexId:"0",
+      departId:"",
+      sexId:"",
       checkId:"",
       personList:[
-        {depart:{departName:"男-设计",id:"1",children:[{name:"陈永杰",id:"1",sex:"1"},{name:"姚鑫",id:"2",sex:"1"},{name:"叶志勇",id:"3",sex:"1"},{name:"陈晨",id:"4",sex:"1"},{name:"陈杰",id:"5",sex:"1"},{name:"易剑芸",id:"6",sex:"1"}]}},
-        {depart:{departName:"女-设计",id:"1",children:[{name:"陈丽丽",id:"11",sex:"2"},{name:"易艳君",id:"12",sex:"2"},{name:"张琪媛",id:"13",sex:"2"},{name:"夏玲玉",id:"14",sex:"2"}]}},
-        {depart:{departName:"男-前端",id:"2",children:[{name:"温富杰",id:"21",sex:"1"},{name:"黄剑坤",id:"22",sex:"1"},{name:"刘宏",id:"23",sex:"1"},{name:"骆至坤",id:"24",sex:"1"},{name:"田文滨",id:"25",sex:"1"}]}},
-        {depart:{departName:"女-前端",id:"2",children:[{name:"刘洪南",id:"31",sex:"2"},{name:"陈梅秀",id:"32",sex:"2"},{name:"李凌燕",id:"33",sex:"2"},{name:"李曼",id:"34",sex:"2"},{name:"周微微",id:"35",sex:"2"}]}}
+        {depart:{departName:"男-设计",children:[{name:"陈永杰",id:"1",sex:"1",depatId:'1'},{name:"姚鑫",id:"2",sex:"1",depatId:'1'},{name:"叶志勇",id:"3",sex:"1",depatId:'1'},{name:"陈晨",id:"4",sex:"1",depatId:'1'},{name:"陈杰",id:"5",sex:"1",depatId:'1'},{name:"易剑芸",id:"6",sex:"1",depatId:'1'}]}},
+        {depart:{departName:"女-设计",children:[{name:"陈丽丽",id:"11",sex:"2",depatId:'1'},{name:"易艳君",id:"12",sex:"2",depatId:'1'},{name:"张琪媛",id:"13",sex:"2",depatId:'1'}]}},
+        {depart:{departName:"男-前端",children:[{name:"黄剑坤",id:"22",sex:"1",depatId:'2'},{name:"刘宏",id:"23",sex:"1",depatId:'2'},{name:"骆至坤",id:"24",sex:"1",depatId:'2'},{name:"田文滨",id:"25",sex:"1",depatId:'2'}]}},
+        {depart:{departName:"女-前端",children:[{name:"刘洪南",id:"31",sex:"2",depatId:'2'},{name:"陈梅秀",id:"32",sex:"2",depatId:'2'},{name:"李凌燕",id:"33",sex:"2",depatId:'2'},{name:"李曼",id:"34",sex:"2",depatId:'2'}]}}
       ],
       unJoinIds:[],//不参与id
       joinIds:[],//参与id
@@ -60,12 +60,12 @@ export default {
         console.log("抽奖人数需要大于0")
         return
       }
-      let departSexArr = this.arrayIntersection(this.arrDepart, this.arrSex);
+      let departSexArr = this.arrayIntersection(this.departJoinIds, this.sexJoinIds);
       this.Arr = this.arrayIntersection(this.joinIds,departSexArr);
-      // console.log(this.arrDepart,'arrDepart')
-      // console.log( this.arrSex,'arrSex')
-      // console.log(this.joinIds, "this.joinIds")
-      // console.log(this.Arr, "交集")
+      console.log(this.departJoinIds,'部门')
+      console.log( this.sexJoinIds,'性别')
+      console.log(this.joinIds, "单独点击")
+      console.log(this.Arr, "交集")
       let getRound=0;
       let timer = setInterval(()=>{
         let getItems = this.getArrayItems(this.Arr,this.SelectedNum);
@@ -87,66 +87,33 @@ export default {
           }
       },100)
     },
-    // 选择性别
-    selectSexEvn(val){
-      
-      console.log(val)
-      this.sexId="0";
-      this.arrSex = [];
-      if(val){
-        this.sexId = val;
-        this.arrSex=this.getSexId(val)
-      }else{
-        this.sexId="0";
-        this.arrSex = this.IdsAll;
-        this.arrDepart = this.IdsAll;
-      }
-        // console.log(this.arrSex)
-    },
-    // 选择部门
-    selectDepartEvn(val){
-      this.departId = "0";
-      this.arrDepart = [];
-      if(val){
-        this.departId = val;
-        this.arrDepart=this.getEleId(val)
-      }else{
-        this.departId = "0";
-        this.arrSex = this.IdsAll;
-        this.arrDepart = this.IdsAll;
-      }
-        // console.log(this.arrDepart)
-      
-    },
-    // 
     isCheckEvn(item){
-      item.unJoin=!item.unJoin;
-      if(item.unJoin){
-        let index_ = this.joinIds.indexOf(item.id);
-        this.joinIds.splice(index_,1)
-        this.unJoinIds.push(item.id);
+      if(item.unJoin||item.unJoinDepat||item.unJoinSex){
+        if(this.departJoinIds.indexOf(item.id)==-1){
+          this.departJoinIds.push(item.id);
+        }
+        if(this.joinIds.indexOf(item.id)==-1){
+          this.joinIds.push(item.id);
+        }
+        if(this.sexJoinIds.indexOf(item.id)==-1){
+          this.sexJoinIds.push(item.id);
+        }
+        item.unJoin=false;
+        item.unJoinDepat=false;
+        item.unJoinSex=false;
       }else{
-        let index = this.unJoinIds.indexOf(item.id);
-        this.unJoinIds.splice(index,1);
-        this.joinIds.push(item.id);
+        let indexDepat = this.departJoinIds.indexOf(item.id);
+        this.departJoinIds.splice(indexDepat,1)
+        let index = this.joinIds.indexOf(item.id);
+        this.joinIds.splice(index,1)
+        let indexSex = this.sexJoinIds.indexOf(item.id);
+        this.sexJoinIds.splice(indexSex,1)
+        item.unJoin=true;
+        item.unJoinDepat=true;
+        item.unJoinSex=true;
       }
+      
     },
-    // joinEvn(str){
-    //   for (let i = 0; i < this.isCheckIds.length; i++) {
-    //       var element = this.isCheckIds[i];
-    //       let index = this.unJoinIds.indexOf(element);
-    //       if(str=='1'){
-    //         this.unJoinIds.splice(index,1);
-    //       }else{
-    //         if(this.unJoinIds.indexOf(element)==-1){
-    //           this.unJoinIds.push(element);
-    //         }
-    //       }
-    //     }
-    //   this.isCheckIds=[];
-    //   console.log(this.unJoinIds,"unjion")
-    //   console.log(this.isCheckIds,'ischexkids')
-    // },
     //从一个给定的数组arr中,随机返回num个不重复项
     getArrayItems(arr,num) {
       if(num<=0){
@@ -180,31 +147,63 @@ export default {
       let intersection = a.filter(function(v){ return b.indexOf(v) > -1 })
       return intersection;
       },
-      getEleId(val){
-        let eleArr =new Array();
-        for (let i = 0; i < this.personList.length; i++) {
-          const element = this.personList[i].depart.children;
-          if(this.personList[i].depart.id==val){
-            for (let j = 0; j < element.length; j++) {
-              const ele = element[j].id;
-              eleArr.push(ele)
-            }
-          }
-        }
-        return eleArr
-      },
-      getSexId(val){
+       // 部门选择
+      selectDepartEvn(val){
+        this.departId = val;
         let eleArr =new Array();
         for (let i = 0; i < this.personList.length; i++) {
           const element = this.personList[i].depart.children;
           for (let j = 0; j < element.length; j++) {
             const ele = element[j].id;
-            if(element[j].sex==val){
-              eleArr.push(ele)
+            if(val){
+                if(element[j].depatId==val){
+                  if(this.departJoinIds.indexOf(ele)==-1){
+                    this.departJoinIds.push(ele)
+                  }
+                  this.$set(element[j],'unJoinDepat', false)
+                }else{
+                  let index = this.departJoinIds.indexOf(ele);
+                  this.departJoinIds.splice(index,1);
+                  this.$set(element[j],'unJoinDepat', true)
+                }
+              }else{
+                this.joinIds = this.IdsAll;
+                this.departJoinIds = this.IdsAll;
+                this.$set(element[j],'unJoin', false)
+                this.$set(element[j],'unJoinDepat', false)
             }
           }
         }
-        return eleArr
+        // console.log(this.departJoinIds)
+      },
+      // 性别选择
+      selectSexEvn(val){
+        this.sexId = val;
+        let eleArr =new Array();
+        for (let i = 0; i < this.personList.length; i++) {
+          const element = this.personList[i].depart.children;
+          for (let j = 0; j < element.length; j++) {
+            const ele = element[j].id;
+            if(val){
+                if(element[j].sex==val){
+                  if(this.sexJoinIds.indexOf(ele)==-1){
+                    this.sexJoinIds.push(ele)
+                  }
+                  this.$set(element[j],'unJoinSex', false)
+                }else{
+                  let index = this.sexJoinIds.indexOf(ele);
+                  this.sexJoinIds.splice(index,1);
+                  this.$set(element[j],'unJoinSex', true)
+                }
+              }else{
+                this.joinIds = this.IdsAll;
+                this.sexJoinIds = this.IdsAll;
+                this.$set(element[j],'unJoin', false)
+                this.$set(element[j],'unJoinSex', false)
+            }
+          }
+        }
+        // console.log(this.sexJoinIds)
       },
   },
   created() {
@@ -217,12 +216,14 @@ export default {
         this.$set(element[j],'selected', false)
         this.$set(element[j],'disabled', false)
         this.$set(element[j],'unJoin', false)
+        this.$set(element[j],'unJoinDepat', false)
+        this.$set(element[j],'unJoinSex', false)
       }
     }
     this.IdsAll = this.Arr.concat();
-    this.arrDepart=this.Arr.concat();
-    this.arrSex=this.Arr.concat();
     this.joinIds=this.Arr.concat();
+    this.departJoinIds=this.Arr.concat();
+    this.sexJoinIds=this.Arr.concat();
   },
 }
 </script>
@@ -264,6 +265,14 @@ a {
   color: #fff;
 }
 .isCheck{
+  background-color: #eee;
+  color: #fff;
+}
+.unJoinSex{
+  background-color: #eee;
+  color: #fff;
+}
+.unJoinDepat{
   background-color: #eee;
   color: #fff;
 }
