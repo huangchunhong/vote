@@ -4,11 +4,12 @@
     <div class="person-list">
       <ul v-for="(item,index) in personList" :key="index" :depart-id="item.depart.id" class="depart">
         <h4>{{item.depart.departName}}</h4>
-        <li class="depart-li" v-for="(itemChild,itemIndex) in item.depart.children" :key="itemIndex" :id="itemChild.id"
-         :class="[departId=='0'?'':departId==item.depart.id?'':'disabled',sexId=='0'?'':sexId==itemChild.sex?'':'disabled-sex',itemChild.check==itemChild.id?'check':'']" 
+        <li class="depart-li" v-for="(itemChild,itemIndex) in item.depart.children" :key="itemIndex" :id="itemChild.id" @click="isCheckEvn(itemChild)"
+         :class="[departId=='0'?'':departId==item.depart.id?'':'disabled',sexId=='0'?'':sexId==itemChild.sex?'':'disabled-sex',itemChild.selected?'isSelected':'',itemChild.unJoin?'isCheck':'',]" 
          :data-id="itemChild.id" :sex="itemChild.sex">{{itemChild.name}}</li>
       </ul>
     </div>
+    
     <div class="vote-opertion-box">
       <el-button @click="voteEvn">抽奖</el-button>
       <el-select v-model="selectDepartVal"  @change="selectDepartEvn">
@@ -22,7 +23,11 @@
         <el-option label="女" value="2"></el-option>
       </el-select>
       <el-input-number v-model="SelectedNum"></el-input-number>
+      <!-- <el-button @click="joinEvn('1')">参与</el-button>
+      <el-button @click="joinEvn('0')" type="danger">不参与</el-button> -->
     </div>
+    <div class="tips-wrap"> <span class="disabled tips">XXX</span>不参与</div>
+    <div class="tips-wrap"> <span class=" tips">XXX</span>参与</div>
   </div>
 </template>
 
@@ -39,11 +44,14 @@ export default {
       sexId:"0",
       checkId:"",
       personList:[
-        {depart:{departName:"男-设计",id:"1",children:[{name:"陈永杰",id:"1",sex:"1",check:""},{name:"姚鑫",id:"2",sex:"1",check:""},{name:"叶志勇",id:"3",sex:"1",check:""},{name:"陈晨",id:"4",sex:"1",check:""},{name:"陈杰",id:"5",sex:"1",check:""},{name:"易剑芸",id:"6",sex:"1",check:""}]}},
-        {depart:{departName:"女-设计",id:"1",children:[{name:"陈丽丽",id:"11",sex:"2",check:""},{name:"易艳君",id:"12",sex:"2",check:""},{name:"张琪媛",id:"13",sex:"2",check:""},{name:"夏玲玉",id:"14",sex:"2",check:""}]}},
-        {depart:{departName:"男-前端",id:"2",children:[{name:"温富杰",id:"21",sex:"1",check:""},{name:"黄剑坤",id:"22",sex:"1",check:""},{name:"刘宏",id:"23",sex:"1",check:""},{name:"骆至坤",id:"24",sex:"1",check:""},{name:"田文滨",id:"25",sex:"1",check:""}]}},
-        {depart:{departName:"女-前端",id:"2",children:[{name:"刘洪南",id:"31",sex:"2",check:""},{name:"陈梅秀",id:"32",sex:"2",check:""},{name:"李凌燕",id:"33",sex:"2",check:""},{name:"李曼",id:"34",sex:"2",check:""},{name:"周微微",id:"35",sex:"2",check:""}]}}
-      ]
+        {depart:{departName:"男-设计",id:"1",children:[{name:"陈永杰",id:"1",sex:"1"},{name:"姚鑫",id:"2",sex:"1"},{name:"叶志勇",id:"3",sex:"1"},{name:"陈晨",id:"4",sex:"1"},{name:"陈杰",id:"5",sex:"1"},{name:"易剑芸",id:"6",sex:"1"}]}},
+        {depart:{departName:"女-设计",id:"1",children:[{name:"陈丽丽",id:"11",sex:"2"},{name:"易艳君",id:"12",sex:"2"},{name:"张琪媛",id:"13",sex:"2"},{name:"夏玲玉",id:"14",sex:"2"}]}},
+        {depart:{departName:"男-前端",id:"2",children:[{name:"温富杰",id:"21",sex:"1"},{name:"黄剑坤",id:"22",sex:"1"},{name:"刘宏",id:"23",sex:"1"},{name:"骆至坤",id:"24",sex:"1"},{name:"田文滨",id:"25",sex:"1"}]}},
+        {depart:{departName:"女-前端",id:"2",children:[{name:"刘洪南",id:"31",sex:"2"},{name:"陈梅秀",id:"32",sex:"2"},{name:"李凌燕",id:"33",sex:"2"},{name:"李曼",id:"34",sex:"2"},{name:"周微微",id:"35",sex:"2"}]}}
+      ],
+      unJoinIds:[],//不参与id
+      joinIds:[],//参与id
+      isCheckIds:[],
     }
   },
   methods:{
@@ -52,9 +60,12 @@ export default {
         console.log("抽奖人数需要大于0")
         return
       }
-      this.Arr = this.arrayIntersection(this.arrDepart, this.arrSex);
-      console.log(this.arrDepart, this.arrSex)
-      console.log(this.Arr, "交集")
+      let departSexArr = this.arrayIntersection(this.arrDepart, this.arrSex);
+      this.Arr = this.arrayIntersection(this.joinIds,departSexArr);
+      // console.log(this.arrDepart,'arrDepart')
+      // console.log( this.arrSex,'arrSex')
+      // console.log(this.joinIds, "this.joinIds")
+      // console.log(this.Arr, "交集")
       let getRound=0;
       let timer = setInterval(()=>{
         let getItems = this.getArrayItems(this.Arr,this.SelectedNum);
@@ -68,9 +79,9 @@ export default {
             for (let j = 0; j < element.length; j++) {
               const ele = element[j].id;
               if(getItems.includes(ele)){
-                element[j].check = ele;//选中
+                element[j].selected = true;//选中
               }else{
-                element[j].check="";//清除选中
+                element[j].selected=false;//清除选中
               }
             }
           }
@@ -87,7 +98,8 @@ export default {
         this.arrSex=this.getSexId(val)
       }else{
         this.sexId="0";
-        this.getDataArr()
+        this.arrSex = this.IdsAll;
+        this.arrDepart = this.IdsAll;
       }
         // console.log(this.arrSex)
     },
@@ -100,11 +112,41 @@ export default {
         this.arrDepart=this.getEleId(val)
       }else{
         this.departId = "0";
-        this.getDataArr()
+        this.arrSex = this.IdsAll;
+        this.arrDepart = this.IdsAll;
       }
         // console.log(this.arrDepart)
       
     },
+    // 
+    isCheckEvn(item){
+      item.unJoin=!item.unJoin;
+      if(item.unJoin){
+        let index_ = this.joinIds.indexOf(item.id);
+        this.joinIds.splice(index_,1)
+        this.unJoinIds.push(item.id);
+      }else{
+        let index = this.unJoinIds.indexOf(item.id);
+        this.unJoinIds.splice(index,1);
+        this.joinIds.push(item.id);
+      }
+    },
+    // joinEvn(str){
+    //   for (let i = 0; i < this.isCheckIds.length; i++) {
+    //       var element = this.isCheckIds[i];
+    //       let index = this.unJoinIds.indexOf(element);
+    //       if(str=='1'){
+    //         this.unJoinIds.splice(index,1);
+    //       }else{
+    //         if(this.unJoinIds.indexOf(element)==-1){
+    //           this.unJoinIds.push(element);
+    //         }
+    //       }
+    //     }
+    //   this.isCheckIds=[];
+    //   console.log(this.unJoinIds,"unjion")
+    //   console.log(this.isCheckIds,'ischexkids')
+    // },
     //从一个给定的数组arr中,随机返回num个不重复项
     getArrayItems(arr,num) {
       if(num<=0){
@@ -164,23 +206,23 @@ export default {
         }
         return eleArr
       },
-    getDataArr(){
-        this.Arr = new Array();
-        for (let i = 0; i < this.personList.length; i++) {
-          const element = this.personList[i].depart.children;
-          for (let j = 0; j < element.length; j++) {
-            const ele = element[j].id;
-            this.Arr.push(ele)
-          }
-        }
-        this.arrDepart=this.Arr.concat();
-        this.arrSex=this.Arr.concat();
-        
-    },
-
   },
   created() {
-    this.getDataArr()
+    this.Arr = new Array();
+    for (let i = 0; i < this.personList.length; i++) {
+      const element = this.personList[i].depart.children;
+      for (let j = 0; j < element.length; j++) {
+        const ele = element[j].id;
+        this.Arr.push(ele)
+        this.$set(element[j],'selected', false)
+        this.$set(element[j],'disabled', false)
+        this.$set(element[j],'unJoin', false)
+      }
+    }
+    this.IdsAll = this.Arr.concat();
+    this.arrDepart=this.Arr.concat();
+    this.arrSex=this.Arr.concat();
+    this.joinIds=this.Arr.concat();
   },
 }
 </script>
@@ -206,10 +248,10 @@ a {
   cursor: pointer;
 }
 .depart-li:hover{
-  background-color: crimson;
+  background-color: #000;
   color: #fff;
 }
-.check{
+.isSelected{
   background-color: crimson;
   color: #fff;
 }
@@ -220,5 +262,23 @@ a {
 .disabled-sex{
   background-color: #eee;
   color: #fff;
+}
+.isCheck{
+  background-color: #eee;
+  color: #fff;
+}
+.vote-opertion-box{
+  padding-bottom: 30px;
+}
+.tips-wrap{
+  float: right;
+  font-size: 12px;
+}
+.tips{
+  margin: 0 10px;
+  padding: 3px 5px;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 14px;
 }
 </style>
