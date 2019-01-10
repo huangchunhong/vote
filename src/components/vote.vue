@@ -6,7 +6,9 @@
         <h4>{{item.depart.departName}}</h4>
         <li class="depart-li" v-for="(itemChild,itemIndex) in item.depart.children" :key="itemIndex" :id="itemChild.id" @click="isCheckEvn(itemChild)"
          :class="[itemChild.selected?'isSelected':'',itemChild.unJoin?'isCheck':'',itemChild.unJoinDepat?'unJoinDepat':'',itemChild.unJoinSex?'unJoinSex':'',]" 
-         :data-id="itemChild.id" :sex="itemChild.sex">{{itemChild.name}}</li>
+         :data-id="itemChild.id" :sex="itemChild.sex"
+          @dblclick="itemChild.selected=!itemChild.selected"
+        >{{itemChild.name}}</li>
       </ul>
     </div>
     
@@ -26,13 +28,14 @@
       <!-- <el-button @click="joinEvn('1')">参与</el-button>
       <el-button @click="joinEvn('0')" type="danger">不参与</el-button> -->
     </div>
+    <div class="tips-wrap">双击切换选择 / 单击切换是否参与</div>
     <div class="tips-wrap"> <span class="disabled tips">XXX</span>不参与</div>
     <div class="tips-wrap"> <span class=" tips">XXX</span>参与</div>
-    <div class="ballon" v-if="winFlag">中奖啦！就是你</div>
+    <div class="ballon" v-if="winFlag">恭喜获奖人员：<br><span v-for="dd in selectArr">{{dd.name}}</span></div>
   </div>
 </template>
 
-<script>
+<script type="text/babel">
 export default {
   name: 'Vote',
   data () {
@@ -54,6 +57,7 @@ export default {
       joinIds:[],//参与id
       isCheckIds:[],
       winFlag:false,
+      selectArr:[],
     }
   },
   methods:{
@@ -76,6 +80,17 @@ export default {
         // console.log(getItems)
           if(getRound==30){
             clearInterval(timer);
+            this.selectArr = [];
+            for (let i = 0; i < this.personList.length; i++) {
+              const element = this.personList[i].depart.children;
+              for (let j = 0; j < element.length; j++) {
+                const ele = element[j].id;
+                if(getItems.includes(ele)){
+                  this.selectArr.push(element[j]);
+                }
+              }
+            }
+
             this.winFlag = true;
           }
           getRound ++;
@@ -262,23 +277,23 @@ a {
   color: #fff;
 }
 .disabled{
-  background-color: #eee;
+  background-color: #B2B2B2;
   color: #fff;
 }
 .disabled-sex{
-  background-color: #eee;
+  background-color: #B2B2B2;
   color: #fff;
 }
 .isCheck{
-  background-color: #eee;
+  background-color: #B2B2B2;
   color: #fff;
 }
 .unJoinSex{
-  background-color: #eee;
+  background-color: #B2B2B2;
   color: #fff;
 }
 .unJoinDepat{
-  background-color: #eee;
+  background-color: #B2B2B2;
   color: #fff;
 }
 .vote-opertion-box{
@@ -313,5 +328,7 @@ a {
         -webkit-animation-iteration-count: 1;  /*动画播放的次数*/
         -webkit-animation-duration: 2s; /*动画所花费的时间*/
         animation-fill-mode: forwards;
+        z-index: 10000; background: rgba(0,0,0,.6); border-radius: 3px;
     }
+  .ballon span {margin-right: 5px;}
 </style>
