@@ -1,12 +1,14 @@
 <template>
-  <div class="vote-box">
+  <div class="vote-box" @click="voteBoxEvn">
     <h2>{{msg}}</h2>
     <div class="person-list">
       <ul v-for="(item,index) in personList" :key="index" :depart-id="item.depart.id" class="depart">
         <h4>{{item.depart.departName}}</h4>
         <li class="depart-li" v-for="(itemChild,itemIndex) in item.depart.children" :key="itemIndex" :id="itemChild.id" @click="isCheckEvn(itemChild)"
          :class="[itemChild.selected?'isSelected':'',itemChild.unJoin?'isCheck':'',itemChild.unJoinDepat?'unJoinDepat':'',itemChild.unJoinSex?'unJoinSex':'',]" 
-         :data-id="itemChild.id" :sex="itemChild.sex">{{itemChild.name}}</li>
+         :data-id="itemChild.id" :sex="itemChild.sex"
+          @dblclick="itemChild.selected=!itemChild.selected"
+        >{{itemChild.name}}</li>
       </ul>
     </div>
     
@@ -26,12 +28,14 @@
       <!-- <el-button @click="joinEvn('1')">参与</el-button>
       <el-button @click="joinEvn('0')" type="danger">不参与</el-button> -->
     </div>
+    <div class="tips-wrap">双击切换选择 / 单击切换是否参与</div>
     <div class="tips-wrap"> <span class="disabled tips">XXX</span>不参与</div>
     <div class="tips-wrap"> <span class=" tips">XXX</span>参与</div>
+    <div class="ballon" v-if="winFlag">恭喜获奖人员：<br><span v-for="dd in selectArr">{{dd.name}}</span></div>
   </div>
 </template>
 
-<script>
+<script type="text/babel">
 export default {
   name: 'Vote',
   data () {
@@ -44,34 +48,50 @@ export default {
       sexId:"",
       checkId:"",
       personList:[
-        {depart:{departName:"男-设计",children:[{name:"陈永杰",id:"1",sex:"1",depatId:'1'},{name:"姚鑫",id:"2",sex:"1",depatId:'1'},{name:"叶志勇",id:"3",sex:"1",depatId:'1'},{name:"陈晨",id:"4",sex:"1",depatId:'1'},{name:"陈杰",id:"5",sex:"1",depatId:'1'},{name:"易剑芸",id:"6",sex:"1",depatId:'1'}]}},
+        {depart:{departName:"男-设计",children:[{name:"陈永杰",id:"1",sex:"1",depatId:'1'},{name:"姚鑫",id:"2",sex:"1",depatId:'1'},{name:"叶志勇",id:"3",sex:"1",depatId:'1'},{name:"陈晨",id:"4",sex:"1",depatId:'1'},{name:"陈杰",id:"5",sex:"1",depatId:'1'},{name:"易剑芸",id:"6",sex:"1",depatId:'1'},{name:"林志华",id:"7",sex:"1",depatId:'1'}]}},
         {depart:{departName:"女-设计",children:[{name:"陈丽丽",id:"11",sex:"2",depatId:'1'},{name:"易艳君",id:"12",sex:"2",depatId:'1'},{name:"张琪媛",id:"13",sex:"2",depatId:'1'}]}},
-        {depart:{departName:"男-前端",children:[{name:"黄剑坤",id:"22",sex:"1",depatId:'2'},{name:"刘宏",id:"23",sex:"1",depatId:'2'},{name:"骆至坤",id:"24",sex:"1",depatId:'2'},{name:"田文滨",id:"25",sex:"1",depatId:'2'}]}},
+        {depart:{departName:"男-前端",children:[{name:"黄剑坤",id:"22",sex:"1",depatId:'2'},{name:"刘宏",id:"23",sex:"1",depatId:'2'},{name:"骆至坤",id:"24",sex:"1",depatId:'2'},{name:"田文滨",id:"25",sex:"1",depatId:'2'},{name:"张弛",id:"26",sex:"1",depatId:'2'}]}},
         {depart:{departName:"女-前端",children:[{name:"刘洪南",id:"31",sex:"2",depatId:'2'},{name:"陈梅秀",id:"32",sex:"2",depatId:'2'},{name:"李凌燕",id:"33",sex:"2",depatId:'2'},{name:"李曼",id:"34",sex:"2",depatId:'2'}]}}
       ],
       unJoinIds:[],//不参与id
       joinIds:[],//参与id
       isCheckIds:[],
+      winFlag:false,
+      selectArr:[],
     }
   },
   methods:{
+    voteBoxEvn(){
+      this.winFlag = false;
+    },
     voteEvn(){
       if(this.SelectedNum<=0){
-        console.log("抽奖人数需要大于0")
-        return
+        return this.$message.warning("抽奖人数需要大于0")
       }
       let departSexArr = this.arrayIntersection(this.departJoinIds, this.sexJoinIds);
       this.Arr = this.arrayIntersection(this.joinIds,departSexArr);
-      console.log(this.departJoinIds,'部门')
-      console.log( this.sexJoinIds,'性别')
-      console.log(this.joinIds, "单独点击")
-      console.log(this.Arr, "交集")
+      // console.log(this.departJoinIds,'部门')
+      // console.log( this.sexJoinIds,'性别')
+      // console.log(this.joinIds, "单独点击")
+      // console.log(this.Arr, "交集")
       let getRound=0;
       let timer = setInterval(()=>{
         let getItems = this.getArrayItems(this.Arr,this.SelectedNum);
         // console.log(getItems)
           if(getRound==30){
-            clearInterval(timer)
+            clearInterval(timer);
+            this.selectArr = [];
+            for (let i = 0; i < this.personList.length; i++) {
+              const element = this.personList[i].depart.children;
+              for (let j = 0; j < element.length; j++) {
+                const ele = element[j].id;
+                if(getItems.includes(ele)){
+                  this.selectArr.push(element[j]);
+                }
+              }
+            }
+
+            this.winFlag = true;
           }
           getRound ++;
           for (let i = 0; i < this.personList.length; i++) {
@@ -257,23 +277,23 @@ a {
   color: #fff;
 }
 .disabled{
-  background-color: #eee;
+  background-color: #B2B2B2;
   color: #fff;
 }
 .disabled-sex{
-  background-color: #eee;
+  background-color: #B2B2B2;
   color: #fff;
 }
 .isCheck{
-  background-color: #eee;
+  background-color: #B2B2B2;
   color: #fff;
 }
 .unJoinSex{
-  background-color: #eee;
+  background-color: #B2B2B2;
   color: #fff;
 }
 .unJoinDepat{
-  background-color: #eee;
+  background-color: #B2B2B2;
   color: #fff;
 }
 .vote-opertion-box{
@@ -290,4 +310,25 @@ a {
   text-align: center;
   font-size: 14px;
 }
+ @keyframes scaleDraw {  /*定义关键帧、scaleDrew是需要绑定到选择器的关键帧名称*/
+      0%{
+          transform: scale(1);  /*开始为原始大小*/
+      }
+      100%{
+          transform: scale(5.1);
+      }
+  }
+    .ballon{
+        width: 150px;
+        position: absolute;
+        top: 40%;left: 50%;margin-left: -75px;
+        color: red;
+        -webkit-animation-name: scaleDraw; /*关键帧名称*/
+        -webkit-animation-timing-function: ease-in-out; /*动画的速度曲线*/
+        -webkit-animation-iteration-count: 1;  /*动画播放的次数*/
+        -webkit-animation-duration: 2s; /*动画所花费的时间*/
+        animation-fill-mode: forwards;
+        z-index: 10000; background: rgba(0,0,0,.6); border-radius: 3px;
+    }
+  .ballon span {margin-right: 5px;}
 </style>
